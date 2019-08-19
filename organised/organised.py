@@ -25,7 +25,8 @@ logger.addHandler(handler)
 preferences = {
     "images": {
         "extensions": ["jpg", "jpeg", "png"],
-        "destination": "$HOME/Pictures/Camera/{Date:%Y-%b}/{Date:%Y-%m-%d} ({EXIF_Model})/{Date:%Y%m%d_%H%M%S}.{File_FileTypeExtension}"
+        # "destination": "$HOME/Pictures/Camera/{Date:%Y-%b}/{Date:%Y-%m-%d} ({EXIF_Model})/{Date:%Y%m%d_%H%M%S}.{File_FileTypeExtension}"
+        "destination": "$HOME/Pictures/Camera/{Date:%Y-%b} ({EXIF_Model})/{Date:%Y%m%d_%H%M%S}.{File_FileTypeExtension}"
     },
     "video": {
         "extensions": ["mov", "vid", "xvid"]
@@ -118,6 +119,10 @@ def main(input_dir='/Users/lukeplausin/Desktop/organise_me/'):
                     preferences[filetype]['files'] = file_list
         for name in dirs:
             pass
+        if all([not os.path.isfile(f) for f in files]) and \
+                all([not os.path.isdir(d) for d in dirs]):
+            logger.info('Removing empty directory {}'.format(root))
+            # os.rmdir(root)
             # print("In directory {}".format(os.path.join(root, name)))
     
     # Process images
