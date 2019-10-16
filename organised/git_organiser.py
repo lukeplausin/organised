@@ -49,23 +49,24 @@ class GitOrganiser(BaseOrganiser):
     def cleanup_file(self, path):
         pass
 
-    def process(self, path):
-        print('I found a git repository at this file path:\n\t{}'.format(path))
-        answer = input('Would you like me to make it smaller by running git clean? [y/n]')
-        if answer.lower() == 'y':
-            # git_args = ["git", "-C", path, "status"]
-            git_args = ["git", "-C", path, "gc", "--aggressive", "--auto"]
-            answer = input('Would you also like me to prune commits older than 2 weeks? [y/n]')
-            if answer.lower() == 'y':
-                git_args.append('--prune')
-            # subprocess.call(git_args)
-            print(git_args)
-            return True
-        elif input('Would you like me to remove the git repository all together? (delete .git etc) [y/n]'
-        ).lower() == 'y':
-            print('cleanup {}'.format(path))
-            # self.cleanup(path)
-            return True
-        else:
-            return False
+    def process(self):
+        logger.warning('This function is not implemented yet')
+        # print('I found a git repository at this file path:\n\t{}'.format(path))
+        # answer = input('Would you like me to make it smaller by running git clean? [y/n]')
+        # if answer.lower() == 'y':
+        #     # git_args = ["git", "-C", path, "status"]
+        #     git_args = ["git", "-C", path, "gc", "--aggressive", "--auto"]
+        #     answer = input('Would you also like me to prune commits older than 2 weeks? [y/n]')
+        #     if answer.lower() == 'y':
+        #         git_args.append('--prune')
+        #     # subprocess.call(git_args)
+        #     print(git_args)
+        #     return True
+        # elif input('Would you like me to remove the git repository all together? (delete .git etc) [y/n]'
+        # ).lower() == 'y':
+        #     print('cleanup {}'.format(path))
+        #     # self.cleanup(path)
+        #     return True
+        # else:
+        #     return False
 

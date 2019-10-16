@@ -52,6 +52,10 @@ class BaseOrganiser(ABC):
     def cleanup_dir(self, path):
         pass
 
+    @abstractmethod
+    def process(self):
+        pass
+
 
 def move_file(source, destination):
     # Attempt to move a file. Deal with potential issues as they occur.

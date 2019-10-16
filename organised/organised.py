@@ -54,7 +54,9 @@ def load_organisers(config):
         elif organiser == 'junk':
             org_objects.append(JunkOrganiser(config))
         else:
-            raise ValueError("Unknown organiser {}".format(organiser))
+            msg = "Unknown organiser {}".format(organiser)
+            logger.critical(msg)
+            raise ValueError(msg)
     return org_objects
 
 
@@ -63,46 +65,34 @@ def main(input_dir, preferences, **kwargs):
     config['preferences'] = preferences
     organisers = load_organisers(config)
 
+    logger.info("Step 1, scanning input directory")
     input_dir = os.path.expanduser(os.path.expandvars(input_dir))
     for root, dirs, files in os.walk(input_dir):
+        # logger.debug("Scanning in {}".format(root))
         for name in files:
             file_type_recognised = []
             for organiser in organisers:
-                full_path = os.path.join(root, name)
-                if organiser.match_file(full_path):
+                full_filename = os.path.join(root, name)
+                if organiser.match_file(full_filename):
                     # The organiser recognises this file type
                     file_type_recognised.append(organiser.__class__)
             if file_type_recognised:
-                logger.debug("File {} matched {} organisers".format(full_path, file_type_recognised))
-            # print("File {} matched {} organisers".format(name, file_type_recognised))
-            # print(os.path.join(root, name))
-    #         file_type_recognised = False
-    #         for filetype, filetype_data in preferences.items():
-    #             if match_file_spec(spec=filetype_data, name=name):
-    #                 file_type_recognised = True
-    #                 file_list = preferences[filetype].get('files', [])
-    #                 file_list.append(os.path.join(root, name))
-    #                 preferences[filetype]['files'] = file_list
+                logger.debug("File {} matched {} organisers".format(full_filename, file_type_recognised))
+            else:
+                pass
+                # logger.debug("File {} matched no organisers".format(full_filename))
 
-    #         if not file_type_recognised:
-    #             logger.info("Unknown file type: {}".format(name))
+        for dirname in dirs:
+            dir_type_recognised = []
+            for organiser in organisers:
+                full_dirname = os.path.join(root, dirname)
+                if organiser.match_dir(full_dirname):
+                    dir_type_recognised.append(organiser.__class__)
+                # logger.debug("Directory {} matched no organisers".format(full_dirname))
 
-    #     for dirname in dirs:
-    #         for organiser in organisers:
-    #             full_dirname = os.path.join(root, dirname)
-    #             if organiser.match(full_dirname):
-    #                 organiser.process(full_dirname)
-
-    # # Process images
-    # file_list = preferences['camera'].get('files', [])
-    # if file_list:
-    #     process_camera(file_list)
-
-    # # Remove junk
-    # process_junk(preferences['junk'].get('files', []))
-
-    # # Cleanup dirs
-    # cleanup_empty_dirs(input_dir)
+    logger.info("Step 2, clean up phase")
+    for organiser in organisers:
+        organiser.process()
 
 
 def cli():

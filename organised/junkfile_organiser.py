@@ -18,7 +18,9 @@ from . import BaseOrganiser, move_file
 class JunkOrganiser(BaseOrganiser):
     def __init__(self, config):
         self.config = config
+        self.dry_run = config['dry_run']
         self.file_list = []
+        self.dir_list = []
         self.file_extensions = [".tmp"]
         self.file_names = [".DS_Store"]
         self.destination = "~/Pictures/MyPhotos/{Date:%Y-%m}_({EXIF_Model})/{Date:%Y%m%d_%H%M%S}.{File_FileTypeExtension}"
@@ -37,18 +39,30 @@ class JunkOrganiser(BaseOrganiser):
     def match_file(self, path):
         path_noext, ext = os.path.splitext(path)
         if ext in self.file_extensions:
-            self.file_list.append(path)
+            judgement = (path, "File has known {} extension".format(ext))
+            self.file_list.append(judgement)
+            logger.info("{} match - {}".format(*judgement))
             return True
+        elif os.path.basename(path) in self.file_names:
+            judgement = (path, "Known junk file".format(ext))
+            self.file_list.append(judgement)
+            logger.info("{} match - {}".format(*judgement))
+            return True
+        else:
+            return False
         # else:
         #     for pattern in spec.get('patterns', []):
         #         if re.match(pattern, name):
         #             return True
 
     def match_dir(self, path):
-        return False
-
-    # def match_dir(self, path):
-    #     return os.path.isdir(os.path.join(path, '.git'))
+        if len(os.listdir(path) ) == 0:
+            judgement = (path, "Directory is empty")
+            self.dir_list.append(judgement)
+            logger.info("{} match - {}".format(*judgement))
+            return True
+        else:
+            return False
 
     def cleanup_dir(self, path):
         pass
@@ -57,40 +71,17 @@ class JunkOrganiser(BaseOrganiser):
         pass
 
     def process(self):
-        # Process images with exif metadata
-        with exiftool.ExifTool() as et:
-            metadata = et.get_metadata_batch(self.file_list)
-        
-        for file_metadata in metadata:
-            try:
-                # Augment the data
-                file_metadata = {
-                    k.replace(":", "_"): v for k, v in file_metadata.items()
-                }
-                file_metadata['File_FileTypeExtension'] = file_metadata['File_FileTypeExtension'].lower()
-                if 'EXIF_CreateDate' in file_metadata.keys():
-                    date = file_metadata['EXIF_CreateDate']
-                else:
-                    date = file_metadata['File_FileModifyDate']
-                file_metadata['Augmented_CreateDate'] = date
-                if '+' in date:
-                    date_parsed = datetime.datetime.strptime(date, '%Y:%m:%d %H:%M:%S%z')
-                else:
-                    date_parsed = datetime.datetime.strptime(date, '%Y:%m:%d %H:%M:%S')
-                file_metadata['Date'] = date_parsed
+        for file_judgement in self.file_list:
+            if self.dry_run:
+                logger.info('DRYRUN: Removing file {}'.format(file_judgement[0]))
+            else:
+                logger.info('Removing file {}'.format(file_judgement[0]))
+                os.remove(file_judgement[0])
 
-                # metadata['Augmented:CreateDate'] = date
-                destination = self.config['camera']['destination'].format(
-                    **file_metadata
-                )
-                if (self.config.get('dry_run', True)):
-                    print("DRYRUN: Move file {} to {}".format(
-                        file_metadata['SourceFile'], destination))
-                else:
-                    move_file(file_metadata['SourceFile'], destination)
-                
-            except KeyError as e:
-                logger.error("File {} missing key {}".format(file_metadata['SourceFile'], e))
-                logger.debug(json.dumps(file_metadata, default=str, indent=2))
-            except Exception as e:
-                logger.error("Exception: {}".format(e))
+        for dir_judgement in self.dir_list:
+            if self.dry_run:
+                logger.info('DRYRUN: Removing directory {}'.format(dir_judgement[0]))
+            else:
+                logger.info('Removing directory {}'.format(dir_judgement[0]))
+                os.rmdir(dir_judgement[0])
+
