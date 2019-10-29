@@ -33,8 +33,12 @@ DEFAULTS={
 }
 
 class BaseOrganiser(ABC):
-    def __init__(self):
-        pass
+    def __init__(self, config={}):
+        self.file_list = []
+        self.dir_list = []
+        self.config = config
+        self.dry_run = config.get('dry_run', False)
+
     
     @abstractmethod
     def match_file(self, path):
@@ -52,41 +56,48 @@ class BaseOrganiser(ABC):
     def cleanup_dir(self, path):
         pass
 
-    @abstractmethod
     def process(self):
-        pass
+        for file_judgement in self.file_list:
+            self.cleanup_file(file_judgement)
+
+        for dir_judgement in self.dir_list:
+            self.cleanup_dir(dir_judgement)
 
 
-def move_file(source, destination):
-    # Attempt to move a file. Deal with potential issues as they occur.
-    destination = os.path.expanduser(os.path.expandvars(destination))
-    dirname = os.path.dirname(destination)
-    source_dirname = os.path.dirname(source)
-    if os.path.isfile(destination):
-        # Destination already exists...
-        if filecmp.cmp(source, destination):
-            logger.info("Deleting file {} duplicated at destination {}".format(
-                source, destination
-            ))
-            # os.remove(source)
-        else:
-            filename, ext = os.path.splitext(destination)
-            ordinal = 1
-            comprimise = "{}_{:03d}{}".format(filename, ordinal, ext)
-            while os.path.isfile(comprimise):
-                ordinal = ordinal + 1
+    def move_file(self, source, destination):
+        # Attempt to move a file. Deal with potential issues as they occur.
+        destination = os.path.expanduser(os.path.expandvars(destination))
+        dirname = os.path.dirname(destination)
+        source_dirname = os.path.dirname(source)
+        if os.path.isfile(destination):
+            # Destination already exists...
+            if filecmp.cmp(source, destination):
+                logger.info("Deleting file {} duplicated at destination {}".format(
+                    source, destination
+                ))
+                print("TODO")
+                # os.remove(source)
+            else:
+                filename, ext = os.path.splitext(destination)
+                ordinal = 1
                 comprimise = "{}_{:03d}{}".format(filename, ordinal, ext)
-            logger.info("Renaming file {} to {} due to file clash at {}".format(
-                source, comprimise, destination))
-            shutil.move(source, comprimise)
-    else:
-        # Trivial case. Check destination dir exists
-        if not os.path.isdir(dirname):
-            logger.info("Creating directory {}".format(dirname))
-            os.makedirs(dirname)
-        logger.info("Moving from {} to {}".format(source, destination))
-        shutil.move(source, destination)
+                while os.path.isfile(comprimise):
+                    ordinal = ordinal + 1
+                    comprimise = "{}_{:03d}{}".format(filename, ordinal, ext)
+                logger.info("Renaming file {} to {} due to file clash at {}".format(
+                    source, comprimise, destination))
+                shutil.move(source, comprimise)
+        else:
+            # Trivial case. Check destination dir exists
+            if not os.path.isdir(dirname):
+                logger.info("Creating directory {}".format(dirname))
+                if not self.dry_run:
+                    os.makedirs(dirname)
+            logger.info("Moving from {} to {}".format(source, destination))
+            if not self.dry_run:
+                shutil.move(source, destination)
 
-    if not os.listdir(source_dirname):
-        logger.info("Removing empty directory {}".format(source_dirname))
-        os.rmdir(source_dirname)
+        if not os.listdir(source_dirname):
+            logger.info("Removing empty directory {}".format(source_dirname))
+            if not self.dry_run:
+                os.rmdir(source_dirname)

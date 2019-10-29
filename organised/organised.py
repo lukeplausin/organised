@@ -8,6 +8,7 @@ import logging.config
 import json
 import re
 import yaml
+import pkg_resources
 
 
 from .git_organiser import GitOrganiser
@@ -20,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 # Some hard coded logging stuff so I can see whats happening
 handler = logging.StreamHandler(sys.stdout)
-handler.setLevel(logging.INFO)
+handler.setLevel(logging.DEBUG)
 # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 formatter = logging.Formatter('%(levelname)s - %(message)s')
 handler.setFormatter(formatter)
@@ -130,10 +131,16 @@ def cli():
         file_config = {}
 
     logging_config_file = os.path.join(config_dir, 'logger.yaml')
+    if not os.path.exists(logging_config_file):
+        # logger.info('Creating default logging file at {}'.format(config_file))
+        pass
     if os.path.exists(logging_config_file):
         logger.info('Loading logger configuration file at {}'.format(logging_config_file))
         with open(logging_config_file, 'r') as f:
             logging.config.dictConfig(yaml.safe_load(f))
+
+    # TODO copy default config over from directory
+
 
     # Resolve config from different sources
     config = DEFAULTS

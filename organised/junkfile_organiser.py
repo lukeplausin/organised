@@ -12,7 +12,7 @@ import exiftool
 logger = logging.getLogger(__name__)
 
 
-from . import BaseOrganiser, move_file
+from . import BaseOrganiser
 
 
 class JunkOrganiser(BaseOrganiser):
@@ -64,24 +64,17 @@ class JunkOrganiser(BaseOrganiser):
         else:
             return False
 
-    def cleanup_dir(self, path):
-        pass
+    def cleanup_dir(self, judgement):
+        if self.dry_run:
+            logger.info('DRYRUN: Removing directory {}'.format(judgement[0]))
+        else:
+            logger.info('Removing directory {}'.format(judgement[0]))
+            os.rmdir(judgement[0])
+
     
-    def cleanup_file(self, path):
-        pass
-
-    def process(self):
-        for file_judgement in self.file_list:
-            if self.dry_run:
-                logger.info('DRYRUN: Removing file {}'.format(file_judgement[0]))
-            else:
-                logger.info('Removing file {}'.format(file_judgement[0]))
-                os.remove(file_judgement[0])
-
-        for dir_judgement in self.dir_list:
-            if self.dry_run:
-                logger.info('DRYRUN: Removing directory {}'.format(dir_judgement[0]))
-            else:
-                logger.info('Removing directory {}'.format(dir_judgement[0]))
-                os.rmdir(dir_judgement[0])
-
+    def cleanup_file(self, judgement):
+        if self.dry_run:
+            logger.info('DRYRUN: Removing file {}'.format(judgement[0]))
+        else:
+            logger.info('Removing file {}'.format(judgement[0]))
+            os.remove(judgement[0])

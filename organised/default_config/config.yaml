@@ -1,0 +1,26 @@
+config_dir: ~/.organised/
+preferences:
+  organisers:
+  - camera
+  - git
+  - junk
+  documents:
+    extensions:
+    - doc
+    - docx
+    - csv
+    - txt
+  org.camera:
+    destination: ~/Pictures/MyPhotos/{Date:%Y-%m}_({EXIF_Model})/{Date:%Y%m%d_%H%M%S}.{File_FileTypeExtension}
+    file_extensions:
+    - .jpg
+    - .jpeg
+    - .png
+    - .3gp
+    - .mov
+    - .mp4
+  org.junk:
+    file_extensions:
+    - .tmp
+    remove_patterns:
+    - .DS_Store
