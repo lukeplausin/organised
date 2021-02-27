@@ -2,44 +2,16 @@ from abc import ABC, abstractmethod
 import os
 import filecmp
 import shutil
-import logging
 
+from . import logger
 
-logger = logging.getLogger(__name__)
-
-
-DEFAULTS={
-    # "input_dir": "~/desktop/"
-    "config_dir": "~/.organised/",
-
-    "preferences": {
-        "organisers": ["camera", "git", "junk"],
-        "org.camera": {
-            "file_extensions": [".jpg", ".jpeg", ".png", ".3gp", ".mov", ".mp4"],
-            # "destination": "$HOME/Pictures/Camera/{Date:%Y-%b}/{Date:%Y-%m-%d} ({EXIF_Model})/{Date:%Y%m%d_%H%M%S}.{File_FileTypeExtension}"
-            "destination": "~/Pictures/MyPhotos/{Date:%Y-%m}_({EXIF_Model})/{Date:%Y%m%d_%H%M%S}.{File_FileTypeExtension}"
-        },
-        "org.junk": {
-            "file_extensions": [".tmp"],
-            "remove_patterns": [".DS_Store"]
-        },
-        # "movie": {
-        #     "extensions": ["mov", "vid", "xvid"]
-        # },
-        "documents": {
-            "extensions": ["doc", "docx", "csv", "txt"]
-        }
-    }
-}
-
-class BaseOrganiser(ABC):
+class BaseOrganizer(ABC):
     def __init__(self, config={}):
         self.file_list = []
         self.dir_list = []
         self.config = config
         self.dry_run = config.get('dry_run', False)
 
-    
     @abstractmethod
     def match_file(self, path):
         return False

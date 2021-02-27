@@ -6,14 +6,11 @@ import json
 import datetime
 import exiftool
 
-
-logger = logging.getLogger(__name__)
-
-
-from . import BaseOrganiser
+from .base_organizer import BaseOrganizer
+from . import logger
 
 
-class CameraOrganiser(BaseOrganiser):
+class CameraOrganizer(BaseOrganizer):
     def __init__(self, config):
         super().__init__(config)
         self.file_extensions = [".jpg", ".jpeg", ".png", ".3gp", ".mov", ".mp4"]

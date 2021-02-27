@@ -7,10 +7,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-from . import BaseOrganiser
+from . import BaseOrganizer
 
 
-class GitOrganiser(BaseOrganiser):
+class GitOrganizer(BaseOrganizer):
     def __init__(self, config):
         self.config = config
         self.file_list = []

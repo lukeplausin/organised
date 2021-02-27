@@ -1,6 +1,6 @@
-config_dir: ~/.organised/
+config_dir: ~/.organized/
 preferences:
-  organisers:
+  organizers:
   - camera
   - git
   - junk

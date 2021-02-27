@@ -12,10 +12,10 @@ import exiftool
 logger = logging.getLogger(__name__)
 
 
-from . import BaseOrganiser
+from . import BaseOrganizer
 
 
-class JunkOrganiser(BaseOrganiser):
+class JunkOrganizer(BaseOrganizer):
     def __init__(self, config):
         self.config = config
         self.dry_run = config['dry_run']

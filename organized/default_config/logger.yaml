@@ -9,11 +9,11 @@ handlers:
     formatter: simple
     stream: ext://sys.stdout
 loggers:
-  organised:
+  organized:
     level: DEBUG
     handlers: [console]
     propagate: no
-  # organised:
+  # organized:
   #   level: DEBUG
   #   handlers: [console]
   #   propagate: no
