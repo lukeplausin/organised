@@ -18,6 +18,7 @@ What I want the project to do soon:
 * Recommend files for compression or deletion
 * Identify duplicate photos or files
 * Produce some nice easy to view visualisations of your mess to help you decide what to do with it
+* Run continuously to sort through and arrange files which you dumped on the desktop or into a 'sort-me' folder
 * Suggestions welcome!
 
 ## Photo sorter
