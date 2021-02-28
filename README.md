@@ -7,7 +7,7 @@
 
 If you answered yes to any of the above, then this project might be able to help you.
 
-# Philosophy
+## Philosophy
 
 `A place for everything and everything in it's place`
 

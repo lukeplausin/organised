@@ -8,6 +8,8 @@ import exiftool
 
 from .base_organizer import BaseOrganizer
 from . import logger
+from ..storage import get_storage
+from ..logic.action import Action
 
 DEFAULT_EXTENSIONS = [".jpg", ".jpeg", ".png", ".3gp", ".mov", ".mp4"]
 DEFAULT_BASE_PATH = '~/Pictures/Camera'
@@ -31,12 +33,14 @@ class CameraOrganizer(BaseOrganizer):
         if "org_camera_destination" in config.keys():
             self.destination = config["org_camera_destination"]
 
-    def match_file(self, path):
-        path_noext, ext = os.path.splitext(path)
+    def match_file(self, file_obj):
+        path_noext, ext = os.path.splitext(file_obj.path)
         if ext in self.file_extensions:
-            judgement = (path, "File has known {} extension".format(ext))
-            self.file_list.append(judgement)
-            logger.debug("{} match - {}".format(*judgement))
+            action = Action(
+                source=file_obj,
+                reason="File has known {} extension".format(ext),
+            )
+            self.file_list.append(action)
             return True
         else:
             return False
@@ -44,25 +48,27 @@ class CameraOrganizer(BaseOrganizer):
     def match_dir(self, path):
         return False
 
-    def cleanup_dir(self, judgement):
+    def cleanup_dir(self, action):
         pass
     
-    def cleanup_file(self, judgement):
-        destination = self.destination.format(
-            **judgement
+    def cleanup_file(self, action):
+        destination_name = self.destination.format(
+            **action.file_metadata
         )
-        self.move_file(judgement['SourceFile'], destination)
+        destination = get_storage(destination_name)
+        action.destination = destination
+        self.move_file(action.source, destination)
 
     def process(self):
         # Process images with exif metadata
         with exiftool.ExifTool() as et:
-            file_list = [file_item[0] for file_item in self.file_list]
+            file_list = [file_item.source.path for file_item in self.file_list]
             if file_list:
                 metadata = et.get_metadata_batch(file_list)
             else:
                 metadata = []
         
-        for file_metadata in metadata:
+        for idx, file_metadata in enumerate(metadata):
             try:
                 # Augment the data
                 file_metadata = {
@@ -79,9 +85,11 @@ class CameraOrganizer(BaseOrganizer):
                 else:
                     date_parsed = datetime.datetime.strptime(date, '%Y:%m:%d %H:%M:%S')
                 file_metadata['Date'] = date_parsed
+                action = self.file_list[idx]
+                action.file_metadata = file_metadata
 
                 # metadata['Augmented:CreateDate'] = date
-                self.cleanup_file(file_metadata)
+                self.cleanup_file(action)
                 
             except KeyError as e:
                 logger.info("File {} missing key {}".format(file_metadata['SourceFile'], e))

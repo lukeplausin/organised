@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
 import os
-import filecmp
-import shutil
 import click
 
 from . import logger
@@ -39,12 +37,12 @@ class BaseOrganizer(ABC):
             self.cleanup_dir(dir_judgement)
 
     def _move_file(self, source, destination):
-        dirname = os.path.dirname(source)
+        dirname = source.dirname()
         if not self.prompt:
-            shutil.move(source, destination)
+            source.move(destination)
         elif dirname in self.user_allowed_dirs:
             logger.debug(f'User has already allowed directory {dirname}.')
-            shutil.move(source, destination)
+            source.move(destination)
         else:
             click.secho("Move file from ", nl=False)
             click.secho(source, fg='yellow', nl=False)
@@ -53,7 +51,7 @@ class BaseOrganizer(ABC):
             click.secho("?")
             response = input("[y: yes|n: no|d: all in directory|a: all] ")
             if response in ['y', 'd', 'a']:
-                shutil.move(source, destination)
+                source.move(destination)
             else:
                 print('skipped..')
             if response == 'd':
@@ -61,19 +59,15 @@ class BaseOrganizer(ABC):
 
     def move_file(self, source, destination):
         # Attempt to move a file. Deal with potential issues as they occur.
-        destination = os.path.expanduser(os.path.expandvars(destination))
-        dirname = os.path.dirname(destination)
-        source_dirname = os.path.dirname(source)
-        if os.path.isfile(destination):
+        dirname = destination.dirname()
+        source_dirname = source.dirname()
+        if destination.is_file():
             # Destination already exists...
-            if filecmp.cmp(source, destination):
-                logger.info("Deleting file {} duplicated at destination {}".format(
-                    source, destination
-                ))
-                logger.error("TODO")
-                # os.remove(source)
+            if source.is_duplicate(destination):
+                reason = "file duplicated at destination {}".format(destination)
+                source.delete(reason=reason)
             else:
-                filename, ext = os.path.splitext(destination)
+                filename, ext = os.path.splitext(destination.path)
                 ordinal = 1
                 comprimise = "{}_{:03d}{}".format(filename, ordinal, ext)
                 while os.path.isfile(comprimise):
@@ -84,15 +78,13 @@ class BaseOrganizer(ABC):
                 self._move_file(source, comprimise)
         else:
             # Trivial case. Check destination dir exists
-            if not os.path.isdir(dirname):
-                logger.info("Creating directory {}".format(dirname))
+            if not destination.storage.is_dir(dirname):
                 if not self.dry_run:
-                    os.makedirs(dirname)
+                    destination.storage.mkdir(dirname)
             logger.info("Moving from {} to {}".format(source, destination))
             if not self.dry_run:
                 self._move_file(source, destination)
 
-        if not os.listdir(source_dirname):
-            logger.info("Removing empty directory {}".format(source_dirname))
+        if not source.storage.list_dir(source_dirname):
             if not self.dry_run:
-                os.rmdir(source_dirname)
+                source.storage.rmdir(source_dirname)

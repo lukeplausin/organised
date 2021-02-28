@@ -10,6 +10,7 @@ import re
 import yaml
 import pkg_resources
 
+from .storage import get_storage
 from .helpers import GitOrganizer, CameraOrganizer, JunkOrganizer
 
 from . import DEFAULTS
@@ -36,20 +37,20 @@ def load_organizers(organizers=ORGANIZER_NAMES, **kwargs):
 
 def main(input_dir, **kwargs):
     organizers = load_organizers(**kwargs)
-
     logger.info("Step 1, scanning input directory")
-    input_dir = os.path.expanduser(os.path.expandvars(input_dir))
-    for root, dirs, files in os.walk(input_dir):
-        # logger.debug("Scanning in {}".format(root))
+
+    source = get_storage(input_dir)
+    for root, dirs, files in source.walk():
         for name in files:
             file_type_recognised = []
             for organizer in organizers:
-                full_filename = os.path.join(root, name)
-                if organizer.match_file(full_filename):
+                file_obj = source.storage.join(root, name, as_object=True)
+                if organizer.match_file(file_obj):
                     # The organizer recognises this file type
                     file_type_recognised.append(organizer.__class__)
             if file_type_recognised:
-                logger.debug("File {} matched {} organizers".format(full_filename, file_type_recognised))
+                logger.debug("File {} matched {} organizers".format(
+                    file_obj.path, file_type_recognised))
             else:
                 pass
                 # logger.debug("File {} matched no organizers".format(full_filename))
@@ -57,7 +58,7 @@ def main(input_dir, **kwargs):
         for dirname in dirs:
             dir_type_recognised = []
             for organizer in organizers:
-                full_dirname = os.path.join(root, dirname)
+                full_dirname = source.storage.join(root, dirname)
                 if organizer.match_dir(full_dirname):
                     dir_type_recognised.append(organizer.__class__)
                 # logger.debug("Directory {} matched no organizers".format(full_dirname))
