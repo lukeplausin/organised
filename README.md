@@ -2,9 +2,20 @@
 
 * Are you hopelessly disorganized?
 * Do you have lots of folders on your desktop named "stuff", "todo", "sort me" etc?
-* Are there many sets of old pictures and photographs scattered around your hard disk and various cloud providers which you want to consolidate?
+* Are you always having trouble finding your files?
+* Are there many sets of old photos scattered around your hard disk and various cloud providers which you want to consolidate?
 
 If you answered yes to any of the above, then this project might be able to help you.
+
+# Philosophy
+
+`A place for everything and everything in it's place`
+
+This is the key to being well organized.
+
+If you are well organised, then you will be more productive and are more likely to achieve your goals and be successful. This is what we get taught growing up and in school - but there are many of us who are well organised at work but have messy lives at home or in the virtual world. It's understandable.. who would want to spend their precious time after work sorting through virtual photo albums or the gigabytes of stuff which you accumulated over the last few years.
+
+The aim of this project is to help you become better organised in your digital life while saving time and doing the boring bits for you. You just tell the project where and how you want your files saved, and the code does the rest for you!
 
 # Features
 
@@ -92,7 +103,7 @@ organize dejunk --dry-run --prompt --no-cleanup-empty-dirs --junk-filenames ".DS
 
 # A word on spelling
 
-Although in my country organise is spelled with an "s", spelling conventions in code tend to take after the U, so for this reason I have decided to use "organize" with a Z throughout the source code. When you install the python module, the CLI scripts are installed to the system with both british and american spellings so this should keep everyone happy.
+In my country 🇬🇧 organise is spelled with an "s", however international code conventions tend to use US spelling so for this reason I've decided to use "organize" (with a Z) throughout the source code. When you install the python module, the CLI scripts are installed to the system with both British and American spellings so this should keep everyone happy.
 
 ```bash
 organise --help
