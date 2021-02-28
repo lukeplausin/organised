@@ -21,6 +21,21 @@ What I want the project to do soon:
 * Run continuously to sort through and arrange files which you dumped on the desktop or into a 'sort-me' folder
 * Suggestions welcome!
 
+# Install
+
+```bash
+pip install git+https://github.com/lukeplausin/organised.git
+```
+
+The tool has a comprehensive CLI based on python click. It is self documenting, so you can use the `--help` parameter on any command or subcommand to check the helptext.
+
+```
+# Show help text
+organize photos --help
+```
+
+# Usage
+
 ## Photo sorter
 
 This is a command line tool which can arrange your photos based on EXIF tags. You as the end user can specify where to move files from and to, and what format to save them in at the destination.
@@ -51,28 +66,18 @@ Example:
 ...
 ```
 
-## Install
-
-```bash
-pip install git+https://github.com/lukeplausin/organised.git
 ```
-
-## Usage
-
-The tool has a comprehensive CLI based on python click. It is self documenting, so you can use the `--help` parameter on any command or subcommand to check the helptext.
-
-```
-# Show help text
-organize photos --help
-
 # Run photo organiser with default options
 organize photos ~/camera/old_stuff
 
 # Run photo organiser in dry-run mode (doesn't do anything it just says what it is going to do)
 organize photos ~/camera/old_stuff --dry-run
 
-# Run organiser with prompt and custom options - data from exif is specified in curly braces {}
-organise photos ~/camera/old_stuff --base-path ~/Pictures/Camera --file-path "{Date:%Y-%m-%d_%H:%M:%S}.{File_FileTypeExtension}"
+# Run organiser with custom options - data from exif is specified in curly braces {}
+organize photos ~/camera/old_stuff --base-path ~/Pictures/Camera --file-path "{Date:%Y-%m-%d_%H:%M:%S}.{File_FileTypeExtension}"
+
+# Run with prompt (asks you before doing anything)
+organize photos ~/camera/old_stuff --prompt
 ```
 
 ## A word on spelling
