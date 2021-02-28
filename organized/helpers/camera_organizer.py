@@ -9,20 +9,27 @@ import exiftool
 from .base_organizer import BaseOrganizer
 from . import logger
 
+DEFAULT_EXTENSIONS = [".jpg", ".jpeg", ".png", ".3gp", ".mov", ".mp4"]
+DEFAULT_BASE_PATH = '~/Pictures/Camera'
+DEFAULT_FILE_PATH = "{Date:%Y-%m} ({EXIF_Model})/{Date:%Y%m%d_%H%M%S}.{File_FileTypeExtension}"
+
 
 class CameraOrganizer(BaseOrganizer):
-    def __init__(self, config):
-        super().__init__(config)
-        self.file_extensions = [".jpg", ".jpeg", ".png", ".3gp", ".mov", ".mp4"]
-        self.destination = "~/Pictures/MyPhotos/{Date:%Y-%m}_({EXIF_Model})/{Date:%Y%m%d_%H%M%S}.{File_FileTypeExtension}"
+    def __init__(
+            self,
+            base_path=DEFAULT_BASE_PATH,
+            file_path=DEFAULT_FILE_PATH,
+            **config
+            ):
+        super().__init__(**config)
+        self.file_extensions = DEFAULT_EXTENSIONS
+        self.destination = os.path.join(base_path, file_path)
 
-        if "org.camera" in self.config["preferences"].keys():
-            # Check for overrides in config
-            plugin_config = self.config["preferences"]["org.camera"]
-            if "file_extensions" in plugin_config.keys():
-                self.file_extensions = plugin_config["file_extensions"]
-            if "destination" in plugin_config.keys():
-                self.destination = plugin_config["destination"]
+        # TODO - clean up config management
+        if "org_camera_file_extensions" in config.keys():
+            self.file_extensions = config["org_camera_file_extensions"]
+        if "org_camera_destination" in config.keys():
+            self.destination = config["org_camera_destination"]
 
     def match_file(self, path):
         path_noext, ext = os.path.splitext(path)
@@ -33,10 +40,6 @@ class CameraOrganizer(BaseOrganizer):
             return True
         else:
             return False
-        # else:
-        #     for pattern in spec.get('patterns', []):
-        #         if re.match(pattern, name):
-        #             return True
 
     def match_dir(self, path):
         return False
@@ -45,15 +48,10 @@ class CameraOrganizer(BaseOrganizer):
         pass
     
     def cleanup_file(self, judgement):
-        destination = self.config['preferences']['org.camera']['destination'].format(
+        destination = self.destination.format(
             **judgement
         )
-        if (self.config.get('dry_run', True)):
-            print("DRYRUN: Move file {} to {}".format(
-                judgement['SourceFile'], destination))
-        else:
-            # move_file(file_metadata['SourceFile'], destination)
-            self.move_file(judgement['SourceFile'], destination)
+        self.move_file(judgement['SourceFile'], destination)
 
     def process(self):
         # Process images with exif metadata
@@ -86,7 +84,7 @@ class CameraOrganizer(BaseOrganizer):
                 self.cleanup_file(file_metadata)
                 
             except KeyError as e:
-                logger.error("File {} missing key {}".format(file_metadata['SourceFile'], e))
+                logger.info("File {} missing key {}".format(file_metadata['SourceFile'], e))
                 logger.debug(json.dumps(file_metadata, default=str, indent=2))
             except Exception as e:
-                logger.error("Exception: {}".format(e))
+                logger.exception(e)

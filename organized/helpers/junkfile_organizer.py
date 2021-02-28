@@ -78,3 +78,18 @@ class JunkOrganizer(BaseOrganizer):
         else:
             logger.info('Removing file {}'.format(judgement[0]))
             os.remove(judgement[0])
+
+# def process_junk(input_file_list):
+#     for file in input_file_list:
+#         logger.info("Removing junk file {}".format(file))
+#         # os.remove(file)
+
+
+# def cleanup_empty_dirs(input_dir):
+#     # Remove empty directories in a tree
+#     # for root, dirs, files in os.walk(input_dir):
+#     #     if all([not os.path.isfile(f) for f in files]) and \
+#     #             all([not os.path.isdir(d) for d in dirs]):
+#     #         logger.info('Removing empty directory {}'.format(root))
+#     #         os.rmdir(root)
+#     pass

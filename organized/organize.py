@@ -10,40 +10,23 @@ import re
 import yaml
 import pkg_resources
 
-
-# from .git_organizer import GitOrganizer
-# from .camera_organizer import CameraOrganizer
-# from .junkfile_organizer import JunkOrganizer
+from .helpers import GitOrganizer, CameraOrganizer, JunkOrganizer
 
 from . import DEFAULTS
 from . import logger
 
-# def process_junk(input_file_list):
-#     for file in input_file_list:
-#         logger.info("Removing junk file {}".format(file))
-#         # os.remove(file)
 
+ORGANIZER_NAMES = ['camera', 'git', 'junk']
 
-# def cleanup_empty_dirs(input_dir):
-#     # Remove empty directories in a tree
-#     # for root, dirs, files in os.walk(input_dir):
-#     #     if all([not os.path.isfile(f) for f in files]) and \
-#     #             all([not os.path.isdir(d) for d in dirs]):
-#     #         logger.info('Removing empty directory {}'.format(root))
-#     #         os.rmdir(root)
-#     pass
-
-
-
-def load_organizers(config):
+def load_organizers(organizers=ORGANIZER_NAMES, **kwargs):
     org_objects = []
-    for organizer in config['preferences']['organizers']:
+    for organizer in organizers:
         if organizer == 'camera':
-            org_objects.append(CameraOrganizer(config))
+            org_objects.append(CameraOrganizer(**kwargs))
         elif organizer == 'git':
-            org_objects.append(GitOrganizer(config))
+            org_objects.append(GitOrganizer(**kwargs))
         elif organizer == 'junk':
-            org_objects.append(JunkOrganizer(config))
+            org_objects.append(JunkOrganizer(**kwargs))
         else:
             msg = "Unknown organizer {}".format(organizer)
             logger.critical(msg)
@@ -51,10 +34,8 @@ def load_organizers(config):
     return org_objects
 
 
-def main(input_dir, preferences, **kwargs):
-    config = kwargs
-    config['preferences'] = preferences
-    organizers = load_organizers(config)
+def main(input_dir, **kwargs):
+    organizers = load_organizers(**kwargs)
 
     logger.info("Step 1, scanning input directory")
     input_dir = os.path.expanduser(os.path.expandvars(input_dir))

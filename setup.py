@@ -20,14 +20,14 @@ setup(
     license='MIT',
     packages=['organized'],
     install_requires=[
-        'pyexiftool', 'click',
+        'pyexiftool', 'click', 'pyyaml',
     ],
     include_package_data=True,
     zip_safe=True,
     entry_points = {
         'console_scripts': [
-            'organized=organized.cli:organize',
-            'organised=organized.cli:organize',
+            'organize=organized.cli:organize',
+            'organise=organized.cli:organize',
             'org=organized.cli:organize',
         ],
     }
