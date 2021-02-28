@@ -15,25 +15,34 @@ logger = logging.getLogger(__name__)
 from . import BaseOrganizer
 
 
+JUNK_FILENAMES = ['.DS_Store']
+JUNK_EXTENSIONS = ['.tmp']
+
+
 class JunkOrganizer(BaseOrganizer):
-    def __init__(self, config):
+    def __init__(
+                self, cleanup_empty_dirs=True, 
+                file_extensions=JUNK_EXTENSIONS,
+                file_names=JUNK_FILENAMES,
+                **config):
+        super().__init__(**config)
         self.config = config
         self.dry_run = config['dry_run']
         self.file_list = []
         self.dir_list = []
-        self.file_extensions = [".tmp"]
-        self.file_names = [".DS_Store"]
-        self.destination = "~/Pictures/MyPhotos/{Date:%Y-%m}_({EXIF_Model})/{Date:%Y%m%d_%H%M%S}.{File_FileTypeExtension}"
+        self.file_extensions = file_extensions
+        self.file_names = file_names
+        self.cleanup_empty_dirs = cleanup_empty_dirs
 
-        if "org.junk" in self.config["preferences"].keys():
-            # Check for overrides in config
-            plugin_config = self.config["preferences"]["org.junk"]
-            if "file_extensions" in plugin_config.keys():
-                self.file_extensions = plugin_config["file_extensions"]
-            if "file_extensions" in plugin_config.keys():
-                self.file_extensions = plugin_config["file_extensions"]
-            if "destination" in plugin_config.keys():
-                self.destination = plugin_config["destination"]
+        # if "org.junk" in self.config["preferences"].keys():
+        #     # Check for overrides in config
+        #     plugin_config = self.config["preferences"]["org.junk"]
+        #     if "file_extensions" in plugin_config.keys():
+        #         self.file_extensions = plugin_config["file_extensions"]
+        #     if "file_extensions" in plugin_config.keys():
+        #         self.file_extensions = plugin_config["file_extensions"]
+        #     if "destination" in plugin_config.keys():
+        #         self.destination = plugin_config["destination"]
 
 
     def match_file(self, path):
@@ -50,13 +59,10 @@ class JunkOrganizer(BaseOrganizer):
             return True
         else:
             return False
-        # else:
-        #     for pattern in spec.get('patterns', []):
-        #         if re.match(pattern, name):
-        #             return True
+
 
     def match_dir(self, path):
-        if len(os.listdir(path) ) == 0:
+        if self.cleanup_empty_dirs and len(os.listdir(path) ) == 0:
             judgement = (path, "Directory is empty")
             self.dir_list.append(judgement)
             logger.info("{} match - {}".format(*judgement))
@@ -65,6 +71,7 @@ class JunkOrganizer(BaseOrganizer):
             return False
 
     def cleanup_dir(self, judgement):
+        # TODO use the base class method..
         if self.dry_run:
             logger.info('DRYRUN: Removing directory {}'.format(judgement[0]))
         else:
@@ -78,18 +85,3 @@ class JunkOrganizer(BaseOrganizer):
         else:
             logger.info('Removing file {}'.format(judgement[0]))
             os.remove(judgement[0])
-
-# def process_junk(input_file_list):
-#     for file in input_file_list:
-#         logger.info("Removing junk file {}".format(file))
-#         # os.remove(file)
-
-
-# def cleanup_empty_dirs(input_dir):
-#     # Remove empty directories in a tree
-#     # for root, dirs, files in os.walk(input_dir):
-#     #     if all([not os.path.isfile(f) for f in files]) and \
-#     #             all([not os.path.isdir(d) for d in dirs]):
-#     #         logger.info('Removing empty directory {}'.format(root))
-#     #         os.rmdir(root)
-#     pass
