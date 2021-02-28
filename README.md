@@ -1,11 +1,24 @@
-# Organised
+# Organized
 
-A system for keeping your desktop and documents tidy
+* Are you hopelessly disorganized?
+* Do you have lots of folders on your desktop named "stuff", "todo", "sort me" etc?
+* Are there many sets of old pictures and photographs scattered around your hard disk and various cloud providers which you want to consolidate?
 
-What it can do for you:
+If you answered yes to any of the above, then this project might be able to help you.
+
+# Features
+
+What the project can do for you already:
 * Arrange photos based on exif tags
 * Clean up junk files
-* More features coming soon?
+
+What I want the project to do soon:
+* Archive old git repositories
+* Find files which are problematic or cause issues
+* Recommend files for compression or deletion
+* Identify duplicate photos or files
+* Produce some nice easy to view visualisations of your mess to help you decide what to do with it
+* Suggestions welcome!
 
 ## Photo sorter
 
