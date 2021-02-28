@@ -57,5 +57,5 @@ from .helpers.junkfile_organizer import JUNK_FILENAMES, JUNK_EXTENSIONS
 @click.option(
     '--junk-extensions', default=JUNK_EXTENSIONS, show_default=True,
     help='Any files with these filename extensions will be deleted.')
-def junk(input_dir, **kwargs):
+def dejunk(input_dir, **kwargs):
     main(organizers=['junk'], input_dir=input_dir, **kwargs)

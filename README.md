@@ -80,7 +80,17 @@ organize photos ~/camera/old_stuff --base-path ~/Pictures/Camera --file-path "{D
 organize photos ~/camera/old_stuff --prompt
 ```
 
-## A word on spelling
+## Junk finder
+
+This utility allows you to find and track down files which might be unwanted. As an example, I use it to delete empty folders, and remove the `.DS_Store` files which my Mac leaves everywhere.
+
+You can customise the file names or extensions which you regard as junk and can switch the empty folder deletion on or off with a command line parameter. The de-junker works recursively through a folder structure so it's useful if you want to repeat an operation throughout a file tree.
+
+```
+organize dejunk --dry-run --prompt --no-cleanup-empty-dirs --junk-filenames ".DS_Store" --junk-filenames ".db"
+```
+
+# A word on spelling
 
 Although in my country organise is spelled with an "s", spelling conventions in code tend to take after the U, so for this reason I have decided to use "organize" with a Z throughout the source code. When you install the python module, the CLI scripts are installed to the system with both british and american spellings so this should keep everyone happy.
 
