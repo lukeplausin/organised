@@ -1,4 +1,5 @@
 from . import logger
+from ..storage.base_file import BaseFile
 
 class Action:
     def __init__(self, source, reason, **kwargs):

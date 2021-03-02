@@ -45,9 +45,9 @@ class BaseOrganizer(ABC):
             source.move(destination)
         else:
             click.secho("Move file from ", nl=False)
-            click.secho(source, fg='yellow', nl=False)
+            click.secho(str(source), fg='yellow', nl=False)
             click.secho(" to ", nl=False)
-            click.secho(destination, fg='yellow', nl=False)
+            click.secho(str(destination), fg='yellow', nl=False)
             click.secho("?")
             response = input("[y: yes|n: no|d: all in directory|a: all] ")
             if response in ['y', 'd', 'a']:

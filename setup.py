@@ -21,6 +21,7 @@ setup(
     packages=['organized'],
     install_requires=[
         'pyexiftool', 'click', 'pyyaml',
+        'boto3',
     ],
     include_package_data=True,
     zip_safe=True,

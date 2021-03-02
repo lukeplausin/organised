@@ -3,13 +3,17 @@ import os
 
 from .base_storage import BaseStorage
 from .base_file import BaseFile
+from .amazon_s3_storage import AmazonS3Storage, AmazonS3File
 
 
-def get_storage(path):
+def get_storage(path, **kwargs):
     # Dynamically select a storage backend depending on the format
     input_dir = os.path.expanduser(os.path.expandvars(path))
     if input_dir.startswith("s3://"):
-        raise NotImplementedError("S3 storage not implemented yet")
+        return AmazonS3File(
+            storage=AmazonS3Storage(**kwargs),
+            path=path
+        )
     if input_dir.startswith("od://"):
         raise NotImplementedError("OneDrive storage not implemented yet")
     if input_dir.startswith("gs://"):

@@ -11,6 +11,7 @@ import yaml
 import pkg_resources
 
 from .storage import get_storage
+from .storage.base_file import BaseFile
 from .helpers import GitOrganizer, CameraOrganizer, JunkOrganizer
 
 from . import DEFAULTS
@@ -39,12 +40,15 @@ def main(input_dir, **kwargs):
     organizers = load_organizers(**kwargs)
     logger.info("Step 1, scanning input directory")
 
-    source = get_storage(input_dir)
+    source = get_storage(input_dir, **kwargs)
     for root, dirs, files in source.walk():
-        for name in files:
+        for file in files:
             file_type_recognised = []
             for organizer in organizers:
-                file_obj = source.storage.join(root, name, as_object=True)
+                if isinstance(file, BaseFile):
+                    file_obj = file
+                else:
+                    file_obj = source.storage.join(root, file, as_object=True)
                 if organizer.match_file(file_obj):
                     # The organizer recognises this file type
                     file_type_recognised.append(organizer.__class__)

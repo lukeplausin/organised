@@ -35,7 +35,7 @@ class CameraOrganizer(BaseOrganizer):
 
     def match_file(self, file_obj):
         path_noext, ext = os.path.splitext(file_obj.path)
-        if ext in self.file_extensions:
+        if ext.lower() in self.file_extensions:
             action = Action(
                 source=file_obj,
                 reason="File has known {} extension".format(ext),
@@ -62,7 +62,7 @@ class CameraOrganizer(BaseOrganizer):
     def process(self):
         # Process images with exif metadata
         with exiftool.ExifTool() as et:
-            file_list = [file_item.source.path for file_item in self.file_list]
+            file_list = [file_item.source.local_path() for file_item in self.file_list]
             if file_list:
                 metadata = et.get_metadata_batch(file_list)
             else:
