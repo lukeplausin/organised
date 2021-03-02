@@ -58,7 +58,11 @@ class AmazonS3Storage(BaseStorage):
 
     def list_dir(self, path):
         # return os.listdir(path)
-        raise NotImplementedError('Not implemented.')
+        s3 = self.session.client('s3')
+        pag = s3.get_paginator('list_objects_v2')
+        for page in pag.paginate(Bucket=path.bucket, Prefix=path.dirname(), Delimiter='/'):
+            for object in page.get('Contents', []):
+                yield AmazonS3File(storage=self, bucket=bucket, path=object['Key'], props=object)
 
     def rmdir(self, path):
         logger.info("Removing empty directory {}".format(path))
